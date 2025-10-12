@@ -30,4 +30,5 @@ public abstract class Envio {
     public String getTipo() {
         return this.getClass().getSimpleName(); 
     }
+
 }
