@@ -39,7 +39,7 @@ public class FrmLogisticaGlobal extends JFrame {
         JToolBar tbOperaciones = new JToolBar();
         tbOperaciones.setFloatable(false);
         
-        JButton btnEditar = new JButton("📝 Editar Envío");
+        JButton btnEditar = new JButton("Editar Envío");
         btnEditar.setToolTipText("Carga el envío seleccionado en el formulario para modificarlo.");
         btnEditar.addActionListener(e -> cargarEnvioSeleccionadoEnFormulario()); 
         tbOperaciones.add(btnEditar);
