@@ -14,6 +14,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.AttributeSet;
 
 import ui.FrmLogisticaGlobal; 
+import modelos.TipoEnvio;
 
 public class PanelDatosEnvio extends JPanel {
     
@@ -40,8 +41,14 @@ public class PanelDatosEnvio extends JPanel {
         txtNumero = new JTextField();
         aplicarFiltroNumerico(txtNumero); 
         addLabelAndField("Número", labelX, row1Y, labelW, txtNumero, textX, row1Y);
+       
+        String[] tipos = new String[TipoEnvio.values().length];
+        int i = 0;
+        for (TipoEnvio tipo : TipoEnvio.values()) {
+            tipos[i++] = tipo.toString(); 
+        }
+        cmbTipo = new JComboBox<>(tipos);
         
-        cmbTipo = new JComboBox<>(new String[]{"Terrestre", "Aéreo", "Marítimo"});
         addLabelAndField("Tipo", col2X, row1Y, labelW, cmbTipo, col2TextX, row1Y);
 
         txtCliente = new JTextField();

@@ -6,7 +6,7 @@ import modelos.Envio;
 import modelos.Terrestre;
 import modelos.Aereo;
 import modelos.Maritimo;
-
+import modelos.TipoEnvio;
 
 public class Logistica {
     private List<Envio> listaEnvios;
@@ -16,7 +16,7 @@ public class Logistica {
     }
 
     public boolean agregarEnvio(Envio nuevoEnvio) {
-        if (buscarEnvioPorCodigo(nuevoEnvio.getCodigo()) != null) {
+        if (buscarEnvioPorCodigo(nuevoEnvio.getCodigo()) != null) { 
             return false;
         }
         return listaEnvios.add(nuevoEnvio);
@@ -35,7 +35,7 @@ public class Logistica {
         }
         return null;
     }
-    
+
     public boolean eliminarEnvio(String codigo) {
         Envio envioAEliminar = buscarEnvioPorCodigo(codigo);
         if (envioAEliminar != null) {
@@ -48,13 +48,13 @@ public class Logistica {
         return new ArrayList<>(listaEnvios);
     }
     
-    private Envio crearNuevoEnvio(String codigo, String tipo, String cliente, double peso, double distancia) {
-        switch (tipo) {
-            case "Terrestre":
+    private Envio crearNuevoEnvio(String codigo, TipoEnvio tipoEnum, String cliente, double peso, double distancia) {
+        switch (tipoEnum) {
+            case TERRESTRE:
                 return new Terrestre(codigo, cliente, peso, distancia);
-            case "Aéreo":
+            case AEREO:
                 return new Aereo(codigo, cliente, peso, distancia);
-            case "Marítimo":
+            case MARITIMO:
                 return new Maritimo(codigo, cliente, peso, distancia);
             default:
                 throw new IllegalArgumentException("Tipo de envío no válido.");
@@ -63,16 +63,19 @@ public class Logistica {
 
     public boolean actualizarEnvioConNuevoCodigo(
             String codigoAntiguo, String codigoNuevo, 
-            String nuevoTipo, String nuevoCliente, double nuevoPeso, double nuevaDistancia) {
+            TipoEnvio nuevoTipo, String nuevoCliente, double nuevoPeso, double nuevaDistancia) {
 
-        if (!codigoAntiguo.equals(codigoNuevo.trim())) {
-            if (buscarEnvioPorCodigo(codigoNuevo.trim()) != null) {
+        String codigoNuevoLimpio = codigoNuevo.trim();
+
+        if (!codigoAntiguo.equals(codigoNuevoLimpio)) {
+            if (buscarEnvioPorCodigo(codigoNuevoLimpio) != null) { 
                 return false; 
             }
         }
+        
         Envio envioAntiguo = buscarEnvioPorCodigo(codigoAntiguo);
         if (envioAntiguo != null) {
-            Envio envioActualizado = crearNuevoEnvio(codigoNuevo, nuevoTipo, nuevoCliente, nuevoPeso, nuevaDistancia);
+            Envio envioActualizado = crearNuevoEnvio(codigoNuevoLimpio, nuevoTipo, nuevoCliente, nuevoPeso, nuevaDistancia);
 
             listaEnvios.remove(envioAntiguo);
             return listaEnvios.add(envioActualizado);

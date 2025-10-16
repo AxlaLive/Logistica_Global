@@ -3,10 +3,12 @@ package controladores;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
+
 import modelos.Aereo;
 import modelos.Envio;
 import modelos.Maritimo;
 import modelos.Terrestre;
+import modelos.TipoEnvio; 
 import servicios.Logistica;
 import ui.FrmLogisticaGlobal;
 
@@ -23,16 +25,22 @@ public class GuardarEnvioListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            String tipo = (String) frame.getCmbTipo().getSelectedItem();
+            String tipoSeleccionadoStr = (String) frame.getCmbTipo().getSelectedItem();
+            TipoEnvio tipoEnumSeguro = getTipoEnvioDesdeString(tipoSeleccionadoStr);
+            
+            if (tipoEnumSeguro == null) {
+                JOptionPane.showMessageDialog(frame, "Error interno: Tipo de envío no reconocido.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }            
             String codigo = frame.getTxtNumero().getText();
             String cliente = frame.getTxtCliente().getText();
             double peso = Double.parseDouble(frame.getTxtPeso().getText()); 
             double distancia = Double.parseDouble(frame.getTxtDistancia().getText());
             String codigoOriginalEdicion = frame.getCodigoOriginalEdicion();
-
+            
             if (codigoOriginalEdicion != null) {
                 if (gestorLogistica.actualizarEnvioConNuevoCodigo(
-                        codigoOriginalEdicion, codigo, tipo, cliente, peso, distancia)) {
+                        codigoOriginalEdicion, codigo, tipoEnumSeguro, cliente, peso, distancia)) {
                     
                     JOptionPane.showMessageDialog(frame, "Envío con código " + codigoOriginalEdicion + 
                                                    " actualizado a " + codigo + " correctamente.", 
@@ -44,22 +52,20 @@ public class GuardarEnvioListener implements ActionListener {
                     JOptionPane.showMessageDialog(frame, "Error: El nuevo código " + codigo + " ya está en uso, o la edición falló.", 
                                                    "Error de Edición", JOptionPane.ERROR_MESSAGE);
                 }
-                
             } else {
                 Envio nuevoEnvio = null;
-
-                switch (tipo) {
-                    case "Terrestre":
+                switch (tipoEnumSeguro) {
+                    case TERRESTRE:
                         nuevoEnvio = new Terrestre(codigo, cliente, peso, distancia);
                         break;
-                    case "Aéreo":
+                    case AEREO:
                         nuevoEnvio = new Aereo(codigo, cliente, peso, distancia);
                         break;
-                    case "Marítimo":
+                    case MARITIMO:
                         nuevoEnvio = new Maritimo(codigo, cliente, peso, distancia);
                         break;
                 }
-                if (gestorLogistica.agregarEnvio(nuevoEnvio)) {
+                if (nuevoEnvio != null && gestorLogistica.agregarEnvio(nuevoEnvio)) {
                     double costo = nuevoEnvio.calcularTarifa();
                     frame.actualizarTablaConNuevoEnvio( 
                         nuevoEnvio.getTipo(),
@@ -71,7 +77,7 @@ public class GuardarEnvioListener implements ActionListener {
                     );
                     frame.limpiarCampos();
                 }
-                else {
+                else if (nuevoEnvio != null) {
                     JOptionPane.showMessageDialog(frame, "Error: Ya existe un envío con el código " + codigo, "Código Duplicado", JOptionPane.WARNING_MESSAGE);
                 }
             }
@@ -80,5 +86,14 @@ public class GuardarEnvioListener implements ActionListener {
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(frame, ex.getMessage(), "Error de Validación", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private TipoEnvio getTipoEnvioDesdeString(String displayValue) {
+        for (TipoEnvio tipo : TipoEnvio.values()) {
+            if (tipo.toString().equals(displayValue)) {
+                return tipo;
+            }
+        }
+        return null;
     }
 }
